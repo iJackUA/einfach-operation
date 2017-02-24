@@ -1,5 +1,8 @@
 <?php
 
+use Railway\Pipe;
+use Railway\Result;
+
 $request = [
     'id' => 123,
     'name' => 'Yevhen',
@@ -16,56 +19,45 @@ sendInfoToExternalService();  // try catch
 
 writeLog(); // supervisory (do smth for both tracks)
 
-printOutput();
+render();
 
 
-$result = Railway::with($request)
+$result = Pipe::with($request)
     ->step(function () {
 
     })
-    ->success()
+    ->success(function () {
+
+    })
+    ->tryCatch(function () {
+
+    })
+    ->wrap(function ($pipe) {
+        /** @var $pipe Pipe */
+        $pipe
+            ->step(function () {
+
+            })
+            ->fail(function () {
+
+            })
+            ->run();
+    })
+    ->fail(function () {
+
+    })
     ->run();
 
 
 if ($result->isSuccess()) {
-    echo $result->value();
+    render($result->value());
 } else {
-    echo $result->error();
+    render($result->error());
 }
 
 
-class Railway
-{
 
-    protected $successTrack;
-    protected $failureTrack;
 
-    function __construct($params)
-    {
-        $this->successTrack = new SplQueue();
-        $this->failureTrack = new SplQueue();
-    }
-
-    static function with($params)
-    {
-        return new static($params);
-    }
-
-    function step(callable $callable, $opt = [])
-    {
-        $this->successTrack->enqueue($callable);
-    }
-
-    function success(callable $callable, $opt = [])
-    {
-        $this->step($callable, array_merge($opt, ['alwaysSuccess' => true]));
-    }
-
-    function fail(callable $callable, $opt = [])
-    {
-        $this->failureTrack->enqueue($callable);
-    }
-}
 
 
 function castRequest($request)
