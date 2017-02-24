@@ -20,40 +20,55 @@ printOutput();
 
 
 $result = Railway::with($request)
-    ->step(function (){})
+    ->step(function () {
+
+    })
     ->success()
     ->run();
 
 
-if ($result->isSuccess()){
+if ($result->isSuccess()) {
     echo $result->value();
 } else {
-    echo $result->value();
+    echo $result->error();
 }
 
 
+class Railway
+{
 
+    protected $successTrack;
+    protected $failureTrack;
 
-
-
-
-
-class Railway {
-    function step($callable, $opt){
-
+    function __construct($params)
+    {
+        $this->successTrack = new SplQueue();
+        $this->failureTrack = new SplQueue();
     }
 
-    function success($callable, $opt){
-
+    static function with($params)
+    {
+        return new static($params);
     }
 
-    function fail($callable, $opt){
+    function step(callable $callable, $opt = [])
+    {
+        $this->successTrack->enqueue($callable);
+    }
 
+    function success(callable $callable, $opt = [])
+    {
+        $this->step($callable, array_merge($opt, ['alwaysSuccess' => true]));
+    }
+
+    function fail(callable $callable, $opt = [])
+    {
+        $this->failureTrack->enqueue($callable);
     }
 }
 
 
-
-function castRequest($request){
+function castRequest($request)
+{
 
 }
