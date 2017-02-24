@@ -17,6 +17,13 @@ class Pipe
         return new static($params);
     }
 
+    /**
+     *
+     *
+     * @param callable $callable Takes any notation from this list http://php.net/manual/en/language.types.callable.php
+     * @param array $opt
+     * @return $this
+     */
     function step(callable $callable, $opt = [])
     {
         $this->successTrack->enqueue($callable);
@@ -25,7 +32,7 @@ class Pipe
 
     function success(callable $callable, $opt = [])
     {
-        $this->step($callable, array_merge($opt, ['alwaysSuccess' => true]));
+        $this->step($callable, array_merge($opt, ['Success' => true]));
         return $this;
     }
 
