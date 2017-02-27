@@ -1,7 +1,7 @@
 <?php
 namespace Railway\Step;
 
-class TryCatch implements IStep
+class Fail implements IStep
 {
 
 }

@@ -1,15 +1,24 @@
 <?php
+
 namespace Railway;
+
+use Railway\Step\Base;
+use Railway\Step\Fail;
+use Railway\Step\IStep;
+use Railway\Step\Proxy;
+use Railway\Step\TryCatch;
+use Railway\Step\Wrap;
 
 class Pipe
 {
-    protected $successTrack;
-    protected $failureTrack;
+    /**
+     * @var SplQueue
+     */
+    protected $stepsQueue;
 
     function __construct($params)
     {
-        $this->successTrack = new SplQueue();
-        $this->failureTrack = new SplQueue();
+        $this->stepsQueue = new SplQueue();
     }
 
     static function with($params)
@@ -19,38 +28,42 @@ class Pipe
 
     /**
      *
-     *
-     * @param callable $callable Takes any notation from this list http://php.net/manual/en/language.types.callable.php
+     * @param IStep $stepObject
      * @param array $opt
      * @return $this
      */
-    function step(callable $callable, $opt = [])
+    function rawStep(IStep $stepObject, $opt = [])
     {
-        $this->successTrack->enqueue($callable);
+        $this->stepsQueue->enqueue($stepObject);
         return $this;
     }
 
-    function success(callable $callable, $opt = [])
+    function step(callable $callable, $opt = [])
     {
-        $this->step($callable, array_merge($opt, ['Success' => true]));
-        return $this;
+        return $this->rawStep(new Base($callable), $opt);
+    }
+
+    function proxy(callable $callable, $opt = [])
+    {
+        return $this->rawStep(new Proxy($callable), $opt);
     }
 
     function fail(callable $callable, $opt = [])
     {
-        $this->failureTrack->enqueue($callable);
-        return $this;
+        return $this->rawStep(new Fail($callable), $opt);
     }
 
-    function tryCatch(callable $callable, $opt = []){
-        return $this;
+    function tryCatch(callable $callable, $opt = [])
+    {
+        return $this->rawStep(new TryCatch($callable), $opt);
     }
 
-    function wrap(callable $callable, $opt = []){
+    function wrap(callable $callable, $opt = [])
+    {
         // check if Result -> evaluate
         // if bool -> passthrough
 
-        return $this;
+        return $this->rawStep(new Wrap($callable), $opt);
     }
 
     /**
@@ -63,7 +76,7 @@ class Pipe
         // on any success Step fails, stop success Track
         // start failure track and loop through it till the end
 
-        foreach ($this->successTrack as $step) {
+        foreach ($this->stepsQueue as $step) {
 
         }
 

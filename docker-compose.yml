@@ -5,7 +5,3 @@ services:
     image: php:7.1-cli
     volumes:
       - .:/www
-  phpunit:
-    image: phpunit/phpunit:6.0.6
-    volumes:
-      - .:/www

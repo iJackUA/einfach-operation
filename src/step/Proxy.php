@@ -1,7 +1,7 @@
 <?php
+namespace Railway\Step;
 
-
-class Proxy
+class Proxy implements IStep
 {
 
 }

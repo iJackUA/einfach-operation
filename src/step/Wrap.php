@@ -1,7 +1,7 @@
 <?php
+namespace Railway\Step;
 
-
-class Wrap
+class Wrap implements IStep
 {
 
 }
