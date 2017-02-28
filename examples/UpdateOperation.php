@@ -6,19 +6,23 @@ use function einfach\operation\response\error;
 
 class UpdateOperation implements \einfach\operation\IOperation
 {
+    /**
+     * @param $params
+     * @return \einfach\operation\Result
+     */
     public function __invoke($params)
     {
-        $result = Railway::with($params)
+        $result = (new Railway)
             ->step(function ($params) {
-                echo "Say hello to anonymous function!";
-                return ok();
+                echo "Hey {$params['name']}. Say hello to anonymous function!";
+                return ok(['newParam' => 'newValue']);
             })
-            ->proxy([$this, 'castRequest'])
-            ->step([$this, 'validateRequest'])
-            ->tryCatch([$this, 'sendNotification'])
-            ->proxy([$this, 'writeLog'])
-            ->fail([$this, 'notifyBigBoss'])
-            ->run();
+//            ->step([$this, 'castRequest'])
+//            ->step([$this, 'validateRequest'])
+//            ->tryCatch([$this, 'sendNotification'])
+//            ->always([$this, 'writeLog'])
+//            ->fail([$this, 'notifyBigBoss'])
+            ->runWithParams($params);
 
         return $result;
     }

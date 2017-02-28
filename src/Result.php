@@ -4,27 +4,32 @@ namespace einfach\operation;
 
 class Result
 {
-    function __construct($params)
+    protected $params;
+    protected $track;
+
+    function __construct($params, $track)
     {
+        $this->params = $params;
+        $this->track = $track;
     }
 
     function isSuccess()
     {
-
+       return $this->track == Railway::TRACK_OK;
     }
 
     function isError()
     {
-
+        return $this->track == Railway::TRACK_ERROR;
     }
 
-    function value()
+    function params()
     {
-
+        return $this->params;
     }
 
-    function error()
+    function errors()
     {
-
+        return $this->params['errors'];
     }
 }

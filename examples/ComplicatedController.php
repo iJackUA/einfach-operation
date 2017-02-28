@@ -22,9 +22,10 @@ class ComplicatedController
 
         // decide what to do with a result
         if ($result->isSuccess()) {
-            return $result->value();
+            print_r($result->params());
+            //return $result->params();
         } else {
-            return $result->error();
+            //return $result->errors();
         }
 
     }
