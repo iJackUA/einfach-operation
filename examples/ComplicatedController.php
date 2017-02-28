@@ -22,10 +22,9 @@ class ComplicatedController
 
         // decide what to do with a result
         if ($result->isSuccess()) {
-            print_r($result->params());
-            //return $result->params();
+            return "Success! User '{$result->params()['model']['name']}' updated!";
         } else {
-            //return $result->errors();
+            return $result->errorsText();
         }
 
     }

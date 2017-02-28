@@ -15,7 +15,7 @@ class Result
 
     function isSuccess()
     {
-       return $this->track == Railway::TRACK_OK;
+        return $this->track == Railway::TRACK_OK;
     }
 
     function isError()
@@ -28,8 +28,18 @@ class Result
         return $this->params;
     }
 
+    function param($name)
+    {
+        return $this->params[$name];
+    }
+
     function errors()
     {
         return $this->params['errors'];
+    }
+
+    function errorsText($glue = '.')
+    {
+        return implode($glue, $this->params['errors']);
     }
 }

@@ -7,7 +7,7 @@ use const einfach\operation\response\RESPONSE_TYPE_ERROR;
 use const einfach\operation\response\RESPONSE_TYPE_OK;
 use einfach\operation\step\Step;
 use einfach\operation\step\Fail;
-use einfach\operation\step\IStep;
+use einfach\operation\step\AbstractStep;
 use einfach\operation\step\Always;
 use einfach\operation\step\TryCatch;
 use einfach\operation\step\Wrap;
@@ -29,11 +29,11 @@ class Railway
 
     /**
      *
-     * @param IStep $stepObject
+     * @param AbstractStep $stepObject
      * @param array $opt
      * @return $this
      */
-    function rawStep(IStep $stepObject, $opt = [])
+    function rawStep(AbstractStep $stepObject, $opt = [])
     {
         $this->stepsQueue->enqueue($stepObject);
         return $this;
@@ -41,21 +41,25 @@ class Railway
 
     function step(callable $callable, $opt = [])
     {
-        return $this->rawStep(new Step($callable), $opt);
+        $name = $this->nextStepName($callable, 'Step');
+        return $this->rawStep(new Step($callable, $name), $opt);
     }
 
     function always(callable $callable, $opt = [])
     {
+        $name = $this->nextStepName($callable, 'Always');
         return $this->rawStep(new Always($callable), $opt);
     }
 
     function fail(callable $callable, $opt = [])
     {
+        $name = $this->nextStepName($callable, 'Fail');
         return $this->rawStep(new Fail($callable), $opt);
     }
 
     function tryCatch(callable $callable, $opt = [])
     {
+        $name = $this->nextStepName($callable, 'TryCatch');
         return $this->rawStep(new TryCatch($callable), $opt);
     }
 
@@ -63,8 +67,14 @@ class Railway
     {
         // check if Result -> evaluate
         // if bool -> passthrough
-
+        $name = $this->nextStepName($callable, 'Wrap');
         return $this->rawStep(new Wrap($callable), $opt);
+    }
+
+    protected function nextStepName(callable $callable, $stepName){
+        $functionName = (is_array($callable) && isset($callable[1]) && is_string($callable[1])) ? $callable[1] : '';
+        $counter = $this->stepsQueue->count() + 1;
+        return "#$counter | $stepName | $functionName";
     }
 
     /**

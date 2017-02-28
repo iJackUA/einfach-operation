@@ -19,40 +19,49 @@ class UpdateOperation implements \einfach\operation\IOperation
             })
 //            ->step([$this, 'castRequest'])
 //            ->step([$this, 'validateRequest'])
+            ->step([$this, 'findUser'])
+//            ->step([$this, 'updateDB'])
 //            ->tryCatch([$this, 'sendNotification'])
 //            ->always([$this, 'writeLog'])
-//            ->fail([$this, 'notifyBigBoss'])
+//            ->fail([$this, 'notifyAdmin'])
             ->runWithParams($params);
 
         return $result;
     }
 
-    protected function castRequest($params)
+    public function castRequest($params)
     {
         return ok();
     }
 
-    protected function validateRequest($params)
+    public function validateRequest($params)
     {
         return ok();
     }
 
-    protected function updateDB($params)
+    public function findUser($params)
+    {
+        // pretend I am doing a query
+        // $user = DB::findById($params['id']);
+        return ok(['model' => ['id' => 123, 'name' => 'Eugene', 'phone' => '111111']]);
+    }
+
+    public function updateDB($params)
     {
         return ok();
     }
 
-    protected function sendNotification($params)
+    public function sendNotification($params)
     {
         return ok();
     }
 
-    protected function writeLog($params)
+    public function writeLog($params)
     {
 
     }
 
-    protected function notifyBigBoss($params)
+    public function notifyAdmin($params)
     {
         return ok();
     }

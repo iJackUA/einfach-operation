@@ -1,7 +1,11 @@
 <?php
+
 namespace einfach\operation\step;
 
-class TryCatch implements IStep
+class TryCatch extends AbstractStep
 {
-
+    function __invoke(&$params)
+    {
+        return call_user_func($this->function, $params);
+    }
 }
