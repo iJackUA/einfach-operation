@@ -1,5 +1,5 @@
 <?php
-namespace Railway\Step;
+namespace einfach\operation\step;
 
 class TryCatch implements IStep
 {

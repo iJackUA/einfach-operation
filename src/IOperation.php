@@ -1,6 +1,6 @@
 <?php
 
-namespace Railway;
+namespace einfach\operation;
 
 interface IOperation
 {

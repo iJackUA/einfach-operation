@@ -1,5 +1,6 @@
 <?php
-namespace Railway\Step;
+
+namespace einfach\operation\step;
 
 class Fail implements IStep
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Railway\Step;
+namespace einfach\operation\step;
 
 class Wrap implements IStep
 {

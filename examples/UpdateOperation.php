@@ -1,16 +1,19 @@
 <?php
-use Railway\Pipe;
 
-class UpdateOperation implements \Railway\IOperation
+use einfach\operation\Railway;
+use function einfach\operation\response\ok;
+use function einfach\operation\response\error;
+
+class UpdateOperation implements \einfach\operation\IOperation
 {
     public function __invoke($params)
     {
-        $result = Pipe::with($params)
+        $result = Railway::with($params)
             ->step(function ($params) {
                 echo "Say hello to anonymous function!";
-                return \Railway\Response\Ok();
+                return ok();
             })
-            ->step([$this, 'castRequest'])
+            ->proxy([$this, 'castRequest'])
             ->step([$this, 'validateRequest'])
             ->tryCatch([$this, 'sendNotification'])
             ->proxy([$this, 'writeLog'])
@@ -22,22 +25,22 @@ class UpdateOperation implements \Railway\IOperation
 
     protected function castRequest($params)
     {
-        return \Railway\Response\Ok();
+        return ok();
     }
 
     protected function validateRequest($params)
     {
-        return \Railway\Response\Ok();
+        return ok();
     }
 
     protected function updateDB($params)
     {
-        return \Railway\Response\Ok();
+        return ok();
     }
 
     protected function sendNotification($params)
     {
-        return \Railway\Response\Ok();
+        return ok();
     }
 
     protected function writeLog($params)
@@ -47,7 +50,7 @@ class UpdateOperation implements \Railway\IOperation
 
     protected function notifyBigBoss($params)
     {
-
+        return ok();
     }
 }
 

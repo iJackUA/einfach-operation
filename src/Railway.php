@@ -1,15 +1,15 @@
 <?php
 
-namespace Railway;
+namespace einfach\operation;
 
-use Railway\Step\Base;
-use Railway\Step\Fail;
-use Railway\Step\IStep;
-use Railway\Step\Proxy;
-use Railway\Step\TryCatch;
-use Railway\Step\Wrap;
 
-class Pipe
+use einfach\operation\step\Base;
+use einfach\operation\step\Fail;
+use einfach\operation\step\Proxy;
+use einfach\operation\step\TryCatch;
+use einfach\operation\step\Wrap;
+
+class Railway
 {
     /**
      * @var SplQueue
@@ -18,7 +18,7 @@ class Pipe
 
     function __construct($params)
     {
-        $this->stepsQueue = new SplQueue();
+        $this->stepsQueue = new \SplQueue();
     }
 
     static function with($params)

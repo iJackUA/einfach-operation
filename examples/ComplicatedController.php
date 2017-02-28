@@ -1,12 +1,14 @@
 <?php
+include 'UpdateOperation.php';
 
 /**
  * Class ComplicatedController
  */
 class ComplicatedController
 {
-    function actionDoTheJob(){
-// simulate a common framework flow with operation
+    function actionDoTheJob()
+    {
+        // simulate a common framework flow with operation
         // Let's assume we've got params smth like this
         // $params = $request->getParams();
         $params = [
@@ -15,12 +17,14 @@ class ComplicatedController
             'phone' => '123456789'
         ];
 
-        $op = (new UpdateOperation)($params);
+        // ✨✨✨ magic is done here ✨✨✨
+        $result = (new UpdateOperation)($params);
 
+        // decide what to do with a result
         if ($result->isSuccess()) {
-            render($result->value());
+            return $result->value();
         } else {
-            render($result->error());
+            return $result->error();
         }
 
     }
