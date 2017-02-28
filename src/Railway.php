@@ -72,7 +72,7 @@ class Railway
     }
 
     protected function nextStepName(callable $callable, $stepName){
-        $functionName = (is_array($callable) && isset($callable[1]) && is_string($callable[1])) ? $callable[1] : '';
+        is_callable($callable, false, $functionName);
         $counter = $this->stepsQueue->count() + 1;
         return "#$counter | $stepName | $functionName";
     }
@@ -86,20 +86,23 @@ class Railway
     {
         // a bit hardcoded, but let it be :)
         $params['errors'] = [];
+        $path = [];
 
         $track = 'ok';
         foreach ($this->stepsQueue as $step) {
+            /** @var $step AbstractStep */
             if (
                 ($track == self::TRACK_OK && !is_a($step, Fail::class))
                 || $track == self::TRACK_ERROR && is_a($step, Fail::class)
                 || $track && is_a($step, Always::class)
             ) {
                 $track = $this->performStep($step, $params);
+                $path[] = $step->name();
             } else {
                 // skip step if does not conform to requirements of execution
             }
         }
-        return new Result($params, $track);
+        return new Result($params, $track, $path);
     }
 
     /**

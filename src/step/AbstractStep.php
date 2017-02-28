@@ -16,5 +16,10 @@ abstract class AbstractStep
         $this->name = $name;
     }
 
+    public function name()
+    {
+        return $this->name;
+    }
+
     abstract public function __invoke(&$params);
 }
