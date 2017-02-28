@@ -2,6 +2,6 @@ version: "3.0"
 
 services:
   php:
-    image: php:7.1-cli
+    build: .
     volumes:
       - .:/www
