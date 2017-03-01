@@ -22,8 +22,8 @@ class UpdateOperation implements \einfach\operation\IOperation
             ->step([$this, 'findUser'])
 //            ->step([$this, 'updateDB'])
 //            ->tryCatch([$this, 'sendNotification'])
-//            ->always([$this, 'writeLog'])
-//            ->fail([$this, 'notifyAdmin'])
+            ->always([$this, 'writeLog'])
+//            ->failure([$this, 'notifyAdmin'])
             ->runWithParams($params);
 
         return $result;
@@ -43,7 +43,9 @@ class UpdateOperation implements \einfach\operation\IOperation
     {
         // pretend I am doing a query
         // $user = DB::findById($params['id']);
-        return ok(['model' => ['id' => 123, 'name' => 'Eugene', 'phone' => '111111']]);
+        $user = (object) ['id' => 123, 'name' => 'Eugene', 'phone' => '111111'];
+       // return ok(['model' => $user]);
+        return error('User not found!');
     }
 
     public function updateDB($params)

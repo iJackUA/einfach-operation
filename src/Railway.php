@@ -3,10 +3,13 @@
 namespace einfach\operation;
 
 
+use function einfach\operation\response\isError;
+use function einfach\operation\response\isOk;
+use function einfach\operation\response\isValidResponse;
 use const einfach\operation\response\RESPONSE_TYPE_ERROR;
 use const einfach\operation\response\RESPONSE_TYPE_OK;
 use einfach\operation\step\Step;
-use einfach\operation\step\Fail;
+use einfach\operation\step\Failure;
 use einfach\operation\step\AbstractStep;
 use einfach\operation\step\Always;
 use einfach\operation\step\TryCatch;
@@ -48,13 +51,13 @@ class Railway
     function always(callable $callable, $opt = [])
     {
         $name = $this->nextStepName($callable, 'Always');
-        return $this->rawStep(new Always($callable), $opt);
+        return $this->rawStep(new Always($callable, $name), $opt);
     }
 
-    function fail(callable $callable, $opt = [])
+    function failure(callable $callable, $opt = [])
     {
         $name = $this->nextStepName($callable, 'Fail');
-        return $this->rawStep(new Fail($callable), $opt);
+        return $this->rawStep(new Failure($callable), $opt);
     }
 
     function tryCatch(callable $callable, $opt = [])
@@ -71,7 +74,8 @@ class Railway
         return $this->rawStep(new Wrap($callable), $opt);
     }
 
-    protected function nextStepName(callable $callable, $stepName){
+    protected function nextStepName(callable $callable, $stepName)
+    {
         is_callable($callable, false, $functionName);
         $counter = $this->stepsQueue->count() + 1;
         return "#$counter | $stepName | $functionName";
@@ -91,16 +95,7 @@ class Railway
         $track = 'ok';
         foreach ($this->stepsQueue as $step) {
             /** @var $step AbstractStep */
-            if (
-                ($track == self::TRACK_OK && !is_a($step, Fail::class))
-                || $track == self::TRACK_ERROR && is_a($step, Fail::class)
-                || $track && is_a($step, Always::class)
-            ) {
-                $track = $this->performStep($step, $params);
-                $path[] = $step->name();
-            } else {
-                // skip step if does not conform to requirements of execution
-            }
+            $track = $this->performStep($step, $params, $track, $path);
         }
         return new Result($params, $track, $path);
     }
@@ -111,24 +106,26 @@ class Railway
      * @return string
      * @throws \Exception
      */
-    protected
-    function performStep($step, &$params)
+    protected function performStep($step, &$params, $track, &$path)
     {
-        $stepResult = $step($params);
-        if ($stepResult && is_array($stepResult) && isset($stepResult['type'])) {
+        $stepResult = $step($params, $track);
+        if (isValidResponse($stepResult)) {
             $type = $stepResult['type'];
-            if ($type == RESPONSE_TYPE_OK) {
-                $track = self::TRACK_OK;
-                $appendParams = $stepResult['appendParams'];
+            if (isOk($type)) {
+                $newTrack = self::TRACK_OK;
+                $appendParams = $stepResult['appendParams'] ?? [];
                 $params = array_merge_recursive($params, $appendParams);
-            } elseif ($type == RESPONSE_TYPE_ERROR) {
-                $track = self::TRACK_ERROR;
-                $appendError = $stepResult['appendError'];
+            } elseif (isError($type)) {
+                $newTrack = self::TRACK_ERROR;
+                $appendError = $stepResult['appendError'] ?? '';
                 $params['errors'][] = $appendError;
             }
+
+            $path[] = $step->name;
         } else {
             throw new \Exception("Step returned incorrectly formatted result");
         }
-        return $track;
+
+        return $newTrack;
     }
 }

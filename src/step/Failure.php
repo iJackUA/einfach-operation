@@ -4,12 +4,12 @@ namespace einfach\operation\step;
 
 use einfach\operation\Railway;
 
-class Wrap extends AbstractStep
+class Failure extends AbstractStep
 {
     function __invoke(&$params, string $track)
     {
-        // only on OK track
-        if ($track == Railway::TRACK_OK) {
+        // only on Error track
+        if ($track == Railway::TRACK_ERROR){
             return call_user_func($this->function, $params);
         }
     }

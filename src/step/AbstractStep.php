@@ -9,6 +9,7 @@ abstract class AbstractStep
      */
     public $function;
     public $name;
+    public $track;
 
     public function __construct(callable $callable, string $name)
     {
@@ -16,10 +17,5 @@ abstract class AbstractStep
         $this->name = $name;
     }
 
-    public function name()
-    {
-        return $this->name;
-    }
-
-    abstract public function __invoke(&$params);
+    abstract public function __invoke(&$params, string $track);
 }
