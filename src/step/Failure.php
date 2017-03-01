@@ -8,9 +8,13 @@ class Failure extends AbstractStep
 {
     function __invoke(&$params, string $track)
     {
-        // only on Error track
+        // works only on Error track
         if ($track == Railway::TRACK_ERROR){
-            return call_user_func($this->function, $params);
+            call_user_func($this->function, $params);
+            // does not respect function return and always back to error track
+            return ['type' => Railway::TRACK_ERROR];
+        } else {
+            $this->skipped = true;
         }
     }
 }

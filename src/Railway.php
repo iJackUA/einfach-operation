@@ -57,13 +57,13 @@ class Railway
     function failure(callable $callable, $opt = [])
     {
         $name = $this->nextStepName($callable, 'Fail');
-        return $this->rawStep(new Failure($callable), $opt);
+        return $this->rawStep(new Failure($callable, $name), $opt);
     }
 
     function tryCatch(callable $callable, $opt = [])
     {
         $name = $this->nextStepName($callable, 'TryCatch');
-        return $this->rawStep(new TryCatch($callable), $opt);
+        return $this->rawStep(new TryCatch($callable, $name), $opt);
     }
 
     function wrap(callable $callable, $opt = [])
@@ -71,7 +71,7 @@ class Railway
         // check if Result -> evaluate
         // if bool -> passthrough
         $name = $this->nextStepName($callable, 'Wrap');
-        return $this->rawStep(new Wrap($callable), $opt);
+        return $this->rawStep(new Wrap($callable, $name), $opt);
     }
 
     protected function nextStepName(callable $callable, $stepName)
@@ -108,22 +108,26 @@ class Railway
      */
     protected function performStep($step, &$params, $track, &$path)
     {
+        $newTrack = $track;
         $stepResult = $step($params, $track);
-        if (isValidResponse($stepResult)) {
-            $type = $stepResult['type'];
-            if (isOk($type)) {
-                $newTrack = self::TRACK_OK;
-                $appendParams = $stepResult['appendParams'] ?? [];
-                $params = array_merge_recursive($params, $appendParams);
-            } elseif (isError($type)) {
-                $newTrack = self::TRACK_ERROR;
-                $appendError = $stepResult['appendError'] ?? '';
-                $params['errors'][] = $appendError;
-            }
 
-            $path[] = $step->name;
-        } else {
-            throw new \Exception("Step returned incorrectly formatted result");
+        if (!$step->skipped) {
+            if (isValidResponse($stepResult)) {
+                $type = $stepResult['type'];
+                if (isOk($type)) {
+                    $newTrack = self::TRACK_OK;
+                    $appendParams = $stepResult['appendParams'] ?? [];
+                    $params = array_merge_recursive($params, $appendParams);
+                } elseif (isError($type)) {
+                    $newTrack = self::TRACK_ERROR;
+                    $appendError = $stepResult['appendError'] ?? '';
+                    $params['errors'][] = $appendError;
+                }
+
+                $path[] = $step->name;
+            } else {
+                throw new \Exception("Step returned incorrectly formatted result");
+            }
         }
 
         return $newTrack;

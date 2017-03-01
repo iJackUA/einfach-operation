@@ -11,6 +11,8 @@ class Step extends AbstractStep
         // only on OK track
         if ($track == Railway::TRACK_OK) {
             return call_user_func($this->function, $params);
+        } else {
+            $this->skipped = true;
         }
     }
 }

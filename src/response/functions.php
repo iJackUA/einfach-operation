@@ -27,5 +27,5 @@ function isError($type)
 
 function isValidResponse($response)
 {
-    return $response && is_array($response) && isset($response['type']);
+    return is_array($response) && isset($response['type']);
 }

@@ -15,7 +15,8 @@ class UpdateOperation implements \einfach\operation\IOperation
         $result = (new Railway)
             ->step(function ($params) {
                 echo "Hey {$params['name']}. Say hello to anonymous function!";
-                return ok(['newParam' => 'newValue']);
+                return error('Early fail');
+                //return ok(['newParam' => 'newValue']);
             })
 //            ->step([$this, 'castRequest'])
 //            ->step([$this, 'validateRequest'])
@@ -23,7 +24,7 @@ class UpdateOperation implements \einfach\operation\IOperation
 //            ->step([$this, 'updateDB'])
 //            ->tryCatch([$this, 'sendNotification'])
             ->always([$this, 'writeLog'])
-//            ->failure([$this, 'notifyAdmin'])
+            ->failure([$this, 'notifyAdmin'])
             ->runWithParams($params);
 
         return $result;
@@ -65,7 +66,7 @@ class UpdateOperation implements \einfach\operation\IOperation
 
     public function notifyAdmin($params)
     {
-        return ok();
+
     }
 }
 
