@@ -15,13 +15,13 @@ class UpdateOperation implements \einfach\operation\IOperation
         $result = (new Railway)
             ->step(function ($params) {
                 echo "Hey {$params['name']}. Say hello to anonymous function!";
-                return error('Early fail');
-                //return ok(['newParam' => 'newValue']);
+                //return error('Early fail');
+                return ok(['newParam' => 'newValue']);
             })
-//            ->step([$this, 'castRequest'])
-//            ->step([$this, 'validateRequest'])
+            ->step([$this, 'castRequest'])
+            ->step([$this, 'validateRequest'])
             ->step([$this, 'findUser'])
-//            ->step([$this, 'updateDB'])
+            ->step([$this, 'updateDB'])
 //            ->tryCatch([$this, 'sendNotification'])
             ->always([$this, 'writeLog'])
             ->failure([$this, 'notifyAdmin'])
