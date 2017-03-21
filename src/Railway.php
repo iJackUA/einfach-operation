@@ -42,34 +42,34 @@ class Railway
 
     function step(callable $callable, $opt = [])
     {
-        $name = $this->nextStepSignature($callable, 'Step', $opt);
-        return $this->rawStep(new Step($callable, $name), $opt);
+        $signature = $this->nextStepSignature($callable, 'Step', $opt);
+        return $this->rawStep(new Step($callable, $signature), $opt);
     }
 
     function always(callable $callable, $opt = [])
     {
-        $name = $this->nextStepSignature($callable, 'Always', $opt);
-        return $this->rawStep(new Always($callable, $name), $opt);
+        $signature = $this->nextStepSignature($callable, 'Always', $opt);
+        return $this->rawStep(new Always($callable, $signature), $opt);
     }
 
     function failure(callable $callable, $opt = [])
     {
-        $name = $this->nextStepSignature($callable, 'Failure', $opt);
-        return $this->rawStep(new Failure($callable, $name), $opt);
+        $signature = $this->nextStepSignature($callable, 'Failure', $opt);
+        return $this->rawStep(new Failure($callable, $signature), $opt);
     }
 
     function tryCatch(callable $callable, $opt = [])
     {
-        $name = $this->nextStepSignature($callable, 'TryCatch', $opt);
-        return $this->rawStep(new TryCatch($callable, $name), $opt);
+        $signature = $this->nextStepSignature($callable, 'TryCatch', $opt);
+        return $this->rawStep(new TryCatch($callable, $signature), $opt);
     }
 
     function wrap(callable $callable, $opt = [])
     {
         // check if Result -> evaluate
         // if bool -> passthrough
-        $name = $this->nextStepSignature($callable, 'Wrap', $opt);
-        return $this->rawStep(new Wrap($callable, $name), $opt);
+        $signature = $this->nextStepSignature($callable, 'Wrap', $opt);
+        return $this->rawStep(new Wrap($callable, $signature), $opt);
     }
 
     protected function nextStepSignature(callable $callable, $stepName, $opt)
@@ -90,14 +90,14 @@ class Railway
     {
         // a bit hardcoded, but let it be :)
         $params['errors'] = [];
-        $path = [];
+        $signaturesPipeline = [];
 
         $track = self::TRACK_SUCCESS;
         foreach ($this->stepsQueue as $step) {
             /** @var $step AbstractStep */
-            $track = $this->performStep($step, $params, $track, $path);
+            $track = $this->performStep($step, $params, $track, $signaturesPipeline);
         }
-        return new Result($params, $track, $path);
+        return new Result($params, $track, $signaturesPipeline);
     }
 
     /**
@@ -106,13 +106,12 @@ class Railway
      * @return string
      * @throws \Exception
      */
-    protected function performStep($step, &$params, $track, &$path)
+    protected function performStep($step, &$params, $track, &$signaturesPipeline)
     {
         $newTrack = $track;
         $stepResult = $step($params, $track);
 
-
-        if (!$step->skipped) {
+        if (!$step->isSkipped()) {
             if (isValidResponse($stepResult)) {
                 $type = $stepResult['type'];
                 if (isOk($type)) {
@@ -125,9 +124,10 @@ class Railway
                     $params['errors'][] = $appendError;
                 }
 
-                $path[] = $step->name;
+                $signaturesPipeline[] = $step->signature;
             } else {
-                throw new \Exception("Step returned incorrectly formatted result");
+                $actualResult = var_export($stepResult, true);
+                throw new \Exception("Step returned incorrectly formatted result: {$actualResult}");
             }
         }
 

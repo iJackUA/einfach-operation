@@ -5,24 +5,24 @@ namespace einfach\operation;
 class Result
 {
     protected $params;
-    protected $track;
-    protected $path;
+    protected $finalTrack;
+    protected $pipeline;
 
-    function __construct($params, $track, $path)
+    function __construct($params, $finalTrack, $pipeline)
     {
         $this->params = $params;
-        $this->track = $track;
-        $this->path = $path;
+        $this->finalTrack = $finalTrack;
+        $this->pipeline = $pipeline;
     }
 
     function isSuccess()
     {
-        return $this->track == Railway::TRACK_SUCCESS;
+        return $this->finalTrack == Railway::TRACK_SUCCESS;
     }
 
     function isError()
     {
-        return $this->track == Railway::TRACK_FAILURE;
+        return $this->finalTrack == Railway::TRACK_FAILURE;
     }
 
     function params()
@@ -45,8 +45,8 @@ class Result
         return implode($glue, $this->params['errors']);
     }
 
-    function inspectPath()
+    function pipeline()
     {
-        return $this->path;
+        return $this->pipeline;
     }
 }

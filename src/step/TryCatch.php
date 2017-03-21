@@ -17,7 +17,7 @@ class TryCatch extends AbstractStep
                 return error($e->getMessage());
             }
         } else {
-            $this->skipped = true;
+            $this->skip();
         }
     }
 }

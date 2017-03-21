@@ -14,7 +14,7 @@ class Failure extends AbstractStep
             // does not respect function return and always back to error track
             return ['type' => Railway::TRACK_FAILURE];
         } else {
-            $this->skipped = true;
+            $this->skip();
         }
     }
 }

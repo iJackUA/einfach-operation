@@ -22,11 +22,11 @@ class ComplicatedController
 
         // decide what to do with a result
         if ($result->isSuccess()) {
-            print_r($result->inspectPath());
+            print_r($result->pipeline());
             $user = $result->params()['model'];
             return "Success! User '{$user->name}' updated!";
         } else {
-            print_r($result->inspectPath());
+            print_r($result->pipeline());
             return $result->errorsText();
         }
 

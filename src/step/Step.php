@@ -12,7 +12,7 @@ class Step extends AbstractStep
         if ($track == Railway::TRACK_SUCCESS) {
             return call_user_func($this->function, $params);
         } else {
-            $this->skipped = true;
+            $this->skip();
         }
     }
 }
