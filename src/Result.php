@@ -17,12 +17,12 @@ class Result
 
     function isSuccess()
     {
-        return $this->track == Railway::TRACK_OK;
+        return $this->track == Railway::TRACK_SUCCESS;
     }
 
     function isError()
     {
-        return $this->track == Railway::TRACK_ERROR;
+        return $this->track == Railway::TRACK_FAILURE;
     }
 
     function params()

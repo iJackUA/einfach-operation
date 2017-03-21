@@ -22,7 +22,7 @@ class UpdateOperation implements \einfach\operation\IOperation
             ->step([$this, 'validateRequest'])
             ->step([$this, 'findUser'])
             ->step([$this, 'updateDB'])
-//            ->tryCatch([$this, 'sendNotification'])
+            ->tryCatch([$this, 'sendNotification'])
             ->always([$this, 'writeLog'])
             ->failure([$this, 'notifyAdmin'])
             ->runWithParams($params);
@@ -45,8 +45,8 @@ class UpdateOperation implements \einfach\operation\IOperation
         // pretend I am doing a query
         // $user = DB::findById($params['id']);
         $user = (object) ['id' => 123, 'name' => 'Eugene', 'phone' => '111111'];
-       // return ok(['model' => $user]);
-        return error('User not found!');
+       return ok(['model' => $user]);
+        //return error('User not found!');
     }
 
     public function updateDB($params)
@@ -56,6 +56,7 @@ class UpdateOperation implements \einfach\operation\IOperation
 
     public function sendNotification($params)
     {
+        //throw new \Exception("Hey there, Exception!");
         return ok();
     }
 

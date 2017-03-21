@@ -6,8 +6,6 @@ namespace einfach\operation;
 use function einfach\operation\response\isError;
 use function einfach\operation\response\isOk;
 use function einfach\operation\response\isValidResponse;
-use const einfach\operation\response\RESPONSE_TYPE_ERROR;
-use const einfach\operation\response\RESPONSE_TYPE_OK;
 use einfach\operation\step\Step;
 use einfach\operation\step\Failure;
 use einfach\operation\step\AbstractStep;
@@ -17,11 +15,11 @@ use einfach\operation\step\Wrap;
 
 class Railway
 {
-    const TRACK_OK = 'ok';
-    const TRACK_ERROR = 'error';
+    const TRACK_SUCCESS = 'success_track';
+    const TRACK_FAILURE = 'failure_track';
 
     /**
-     * @var SplQueue
+     * @var \SplQueue
      */
     protected $stepsQueue;
 
@@ -44,25 +42,25 @@ class Railway
 
     function step(callable $callable, $opt = [])
     {
-        $name = $this->nextStepName($callable, 'Step');
+        $name = $this->nextStepSignature($callable, 'Step', $opt);
         return $this->rawStep(new Step($callable, $name), $opt);
     }
 
     function always(callable $callable, $opt = [])
     {
-        $name = $this->nextStepName($callable, 'Always');
+        $name = $this->nextStepSignature($callable, 'Always', $opt);
         return $this->rawStep(new Always($callable, $name), $opt);
     }
 
     function failure(callable $callable, $opt = [])
     {
-        $name = $this->nextStepName($callable, 'Fail');
+        $name = $this->nextStepSignature($callable, 'Failure', $opt);
         return $this->rawStep(new Failure($callable, $name), $opt);
     }
 
     function tryCatch(callable $callable, $opt = [])
     {
-        $name = $this->nextStepName($callable, 'TryCatch');
+        $name = $this->nextStepSignature($callable, 'TryCatch', $opt);
         return $this->rawStep(new TryCatch($callable, $name), $opt);
     }
 
@@ -70,15 +68,17 @@ class Railway
     {
         // check if Result -> evaluate
         // if bool -> passthrough
-        $name = $this->nextStepName($callable, 'Wrap');
+        $name = $this->nextStepSignature($callable, 'Wrap', $opt);
         return $this->rawStep(new Wrap($callable, $name), $opt);
     }
 
-    protected function nextStepName(callable $callable, $stepName)
+    protected function nextStepSignature(callable $callable, $stepName, $opt)
     {
         is_callable($callable, false, $functionName);
+        // assign custom step name from operation if provided
+        $functionName = $opt['name'] ?? $functionName;
         $counter = $this->stepsQueue->count() + 1;
-        return "#$counter | $stepName | $functionName";
+        return "#".sprintf("%02d", $counter)." | ".sprintf("%-10s", $stepName)." | $functionName";
     }
 
     /**
@@ -92,7 +92,7 @@ class Railway
         $params['errors'] = [];
         $path = [];
 
-        $track = 'ok';
+        $track = self::TRACK_SUCCESS;
         foreach ($this->stepsQueue as $step) {
             /** @var $step AbstractStep */
             $track = $this->performStep($step, $params, $track, $path);
@@ -111,15 +111,16 @@ class Railway
         $newTrack = $track;
         $stepResult = $step($params, $track);
 
+
         if (!$step->skipped) {
             if (isValidResponse($stepResult)) {
                 $type = $stepResult['type'];
                 if (isOk($type)) {
-                    $newTrack = self::TRACK_OK;
+                    $newTrack = self::TRACK_SUCCESS;
                     $appendParams = $stepResult['appendParams'] ?? [];
                     $params = array_merge_recursive($params, $appendParams);
                 } elseif (isError($type)) {
-                    $newTrack = self::TRACK_ERROR;
+                    $newTrack = self::TRACK_FAILURE;
                     $appendError = $stepResult['appendError'] ?? '';
                     $params['errors'][] = $appendError;
                 }
