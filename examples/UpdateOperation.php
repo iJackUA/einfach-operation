@@ -18,6 +18,7 @@ class UpdateOperation implements \einfach\operation\IOperation
                 //return error('Early fail');
                 return ok(['newParam' => 'newValue']);
             })
+            ->step([$this, 'nestedRailway'])
             ->step([$this, 'castRequest'])
             ->step([$this, 'validateRequest'])
             ->step([$this, 'findUser'])
@@ -28,6 +29,15 @@ class UpdateOperation implements \einfach\operation\IOperation
             ->runWithParams($params);
 
         return $result;
+    }
+
+    public function nestedRailway($params){
+        return (new Railway)
+            ->step(function ($params){
+                return error('Nested Railway failed!');
+                return ok(['nestedRwParam' => 'nestedRwValue']);
+            })
+            ->runWithParams($params);
     }
 
     public function castRequest($params)

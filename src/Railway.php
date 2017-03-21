@@ -6,6 +6,8 @@ namespace einfach\operation;
 use function einfach\operation\response\isError;
 use function einfach\operation\response\isOk;
 use function einfach\operation\response\isValidResponse;
+use const einfach\operation\response\RESPONSE_TYPE_ERROR;
+use const einfach\operation\response\RESPONSE_TYPE_OK;
 use einfach\operation\step\Step;
 use einfach\operation\step\Failure;
 use einfach\operation\step\AbstractStep;
@@ -78,7 +80,7 @@ class Railway
         // assign custom step name from operation if provided
         $functionName = $opt['name'] ?? $functionName;
         $counter = $this->stepsQueue->count() + 1;
-        return "#".sprintf("%02d", $counter)." | ".sprintf("%-10s", $stepName)." | $functionName";
+        return "#" . sprintf("%02d", $counter) . " | " . sprintf("%-10s", $stepName) . " | $functionName";
     }
 
     /**
@@ -110,6 +112,20 @@ class Railway
     {
         $newTrack = $track;
         $stepResult = $step($params, $track);
+//TODO: Extract method
+        if (is_a($stepResult, Result::class)) {
+            if ($stepResult->isSuccess()) {
+                $stepResult = [
+                    'type' => RESPONSE_TYPE_OK,
+                    'appendParams' => $stepResult->params()
+                ];
+            } else {
+                $stepResult = [
+                    'type' => RESPONSE_TYPE_ERROR,
+                    'appendError' => $stepResult->errors()
+                ];
+            }
+        }
 
         if (!$step->isSkipped()) {
             if (isValidResponse($stepResult)) {
@@ -117,11 +133,14 @@ class Railway
                 if (isOk($type)) {
                     $newTrack = self::TRACK_SUCCESS;
                     $appendParams = $stepResult['appendParams'] ?? [];
-                    $params = array_merge_recursive($params, $appendParams);
+                    $params = array_merge($params, $appendParams);
                 } elseif (isError($type)) {
                     $newTrack = self::TRACK_FAILURE;
-                    $appendError = $stepResult['appendError'] ?? '';
-                    $params['errors'][] = $appendError;
+                    $appendError = [$stepResult['appendError']] ?? [];
+                    // TODO: Fix errors merge
+                    print_r($params['errors']);
+                    print_r($appendError);
+                    $params['errors'] = $params['errors'] + $appendError;
                 }
 
                 $signaturesPipeline[] = $step->signature;

@@ -2,8 +2,8 @@
 
 namespace einfach\operation\response;
 
-const RESPONSE_TYPE_OK = 'ok';
-const RESPONSE_TYPE_ERROR = 'error';
+const RESPONSE_TYPE_OK = 'ok_step_response';
+const RESPONSE_TYPE_ERROR = 'error_step_response';
 
 function ok($appendParams = [])
 {
