@@ -2,7 +2,7 @@
 
 [![Build Status][ico-travis]][link-travis] [![Latest Version on Packagist][ico-version]][link-packagist] [![Total Downloads][ico-downloads]][link-downloads] [![Software License][ico-license]](LICENSE.md)
 
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/c44c1a61-0864-4ae6-9712-e2d7120fa9c5/small.png)](https://insight.sensiolabs.com/projects/c44c1a61-0864-4ae6-9712-e2d7120fa9c5) [![Coverage Status][ico-scrutinizer]][link-scrutinizer] [![Quality Score][ico-code-quality]][link-code-quality] [![Code Climate][ico-codeclimate]][link-codeclimate]
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/f22fdf06-efc2-4886-ae9e-7f3613cce263/big.png)](https://insight.sensiolabs.com/projects/f22fdf06-efc2-4886-ae9e-7f3613cce263) [![Coverage Status][ico-scrutinizer]][link-scrutinizer] [![Quality Score][ico-code-quality]][link-code-quality] [![Code Climate][ico-codeclimate]][link-codeclimate]
 
 
 ### First step
