@@ -72,7 +72,7 @@ class Railway
         return $this->rawStep(new Wrap($callable, $signature), $opt);
     }
 
-    public protected function nextStepSignature(callable $callable, $stepName, $opt)
+    public function nextStepSignature(callable $callable, $stepName, $opt)
     {
         is_callable($callable, false, $functionName);
         // assign custom step name from operation if provided
