@@ -10,7 +10,7 @@ class UpdateOperation implements \einfach\operation\IOperation
      * @param $params
      * @return \einfach\operation\Result
      */
-    public function __invoke($params)
+    public public function __invoke($params)
     {
         $result = (new Railway)
             ->step(function ($params) {

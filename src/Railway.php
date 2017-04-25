@@ -1,7 +1,5 @@
 <?php
-
 namespace einfach\operation;
-
 
 use function einfach\operation\response\isError;
 use function einfach\operation\response\isOk;
@@ -25,7 +23,7 @@ class Railway
      */
     protected $stepsQueue;
 
-    function __construct()
+    public function __construct()
     {
         $this->stepsQueue = new \SplQueue();
     }
@@ -36,37 +34,37 @@ class Railway
      * @param array $opt
      * @return $this
      */
-    function rawStep(AbstractStep $stepObject, $opt = [])
+    public function rawStep(AbstractStep $stepObject, $opt = [])
     {
         $this->stepsQueue->enqueue($stepObject);
         return $this;
     }
 
-    function step(callable $callable, $opt = [])
+    public function step(callable $callable, $opt = [])
     {
         $signature = $this->nextStepSignature($callable, 'Step', $opt);
         return $this->rawStep(new Step($callable, $signature), $opt);
     }
 
-    function always(callable $callable, $opt = [])
+    public function always(callable $callable, $opt = [])
     {
         $signature = $this->nextStepSignature($callable, 'Always', $opt);
         return $this->rawStep(new Always($callable, $signature), $opt);
     }
 
-    function failure(callable $callable, $opt = [])
+    public function failure(callable $callable, $opt = [])
     {
         $signature = $this->nextStepSignature($callable, 'Failure', $opt);
         return $this->rawStep(new Failure($callable, $signature), $opt);
     }
 
-    function tryCatch(callable $callable, $opt = [])
+    public function tryCatch(callable $callable, $opt = [])
     {
         $signature = $this->nextStepSignature($callable, 'TryCatch', $opt);
         return $this->rawStep(new TryCatch($callable, $signature), $opt);
     }
 
-    function wrap(callable $callable, $opt = [])
+    public function wrap(callable $callable, $opt = [])
     {
         // check if Result -> evaluate
         // if bool -> passthrough
@@ -74,7 +72,7 @@ class Railway
         return $this->rawStep(new Wrap($callable, $signature), $opt);
     }
 
-    protected function nextStepSignature(callable $callable, $stepName, $opt)
+    public protected function nextStepSignature(callable $callable, $stepName, $opt)
     {
         is_callable($callable, false, $functionName);
         // assign custom step name from operation if provided
@@ -88,7 +86,7 @@ class Railway
      * @return Result
      * @throws \Exception
      */
-    function runWithParams($params)
+    public function runWithParams($params)
     {
         // a bit hardcoded, but let it be :)
         $params['errors'] = [];

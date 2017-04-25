@@ -7,7 +7,7 @@ use function einfach\operation\response\error;
 
 class TryCatch extends AbstractStep
 {
-    function __invoke(&$params, string $track)
+    public function __invoke(&$params, string $track)
     {
         // only on OK track
         if ($track == Railway::TRACK_SUCCESS) {

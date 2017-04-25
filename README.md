@@ -13,10 +13,10 @@
 
 * `docker-compose run php php -f ./examples/example.php`
 
-### Run tests
+### Run tests/inspections
 
 * `docker-compose run php phpunit`
-
+* `docker-compose run php ./vendor/bin/phpcs --standard=psr2 src/`
 
 
 ## License
