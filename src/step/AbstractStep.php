@@ -34,5 +34,5 @@ abstract class AbstractStep
         return $this->skipped = true;
     }
 
-    abstract public public function __invoke(&$params, string $track);
+    abstract public function __invoke(&$params, string $track);
 }

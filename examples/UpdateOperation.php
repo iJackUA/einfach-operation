@@ -10,7 +10,7 @@ class UpdateOperation implements \einfach\operation\IOperation
      * @param $params
      * @return \einfach\operation\Result
      */
-    public public function __invoke($params)
+    public function __invoke($params)
     {
         $result = (new Railway)
             ->step(function ($params) {
@@ -34,7 +34,7 @@ class UpdateOperation implements \einfach\operation\IOperation
     public function nestedRailway($params){
         return (new Railway)
             ->step(function ($params){
-                return error('Nested Railway failed!');
+                //return error('Nested Railway failed!');
                 return ok(['nestedRwParam' => 'nestedRwValue']);
             })
             ->runWithParams($params);
