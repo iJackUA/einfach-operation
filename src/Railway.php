@@ -2,7 +2,6 @@
 
 namespace einfach\operation;
 
-
 use function einfach\operation\response\isError;
 use function einfach\operation\response\isOk;
 use function einfach\operation\response\isValidResponse;
@@ -36,37 +35,37 @@ class Railway
      * @param array $opt
      * @return $this
      */
-    function rawStep(AbstractStep $stepObject, $opt = [])
+    function rawStep(AbstractStep $stepObject, $opt = []) : Railway
     {
         $this->stepsQueue->enqueue($stepObject);
         return $this;
     }
 
-    function step(callable $callable, $opt = [])
+    function step(callable $callable, $opt = []) : Railway
     {
         $signature = $this->nextStepSignature($callable, 'Step', $opt);
         return $this->rawStep(new Step($callable, $signature), $opt);
     }
 
-    function always(callable $callable, $opt = [])
+    function always(callable $callable, $opt = []) : Railway
     {
         $signature = $this->nextStepSignature($callable, 'Always', $opt);
         return $this->rawStep(new Always($callable, $signature), $opt);
     }
 
-    function failure(callable $callable, $opt = [])
+    function failure(callable $callable, $opt = []) : Railway
     {
         $signature = $this->nextStepSignature($callable, 'Failure', $opt);
         return $this->rawStep(new Failure($callable, $signature), $opt);
     }
 
-    function tryCatch(callable $callable, $opt = [])
+    function tryCatch(callable $callable, $opt = []) : Railway
     {
         $signature = $this->nextStepSignature($callable, 'TryCatch', $opt);
         return $this->rawStep(new TryCatch($callable, $signature), $opt);
     }
 
-    function wrap(callable $callable, $opt = [])
+    function wrap(callable $callable, $opt = []) : Railway
     {
         // check if Result -> evaluate
         // if bool -> passthrough
@@ -74,7 +73,7 @@ class Railway
         return $this->rawStep(new Wrap($callable, $signature), $opt);
     }
 
-    protected function nextStepSignature(callable $callable, $stepName, $opt)
+    protected function nextStepSignature(callable $callable, $stepName, $opt) : string
     {
         is_callable($callable, false, $functionName);
         // assign custom step name from operation if provided

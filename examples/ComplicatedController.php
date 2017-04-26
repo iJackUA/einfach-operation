@@ -29,6 +29,5 @@ class ComplicatedController
             print_r($result->pipeline());
             return $result->errorsText();
         }
-
     }
 }
