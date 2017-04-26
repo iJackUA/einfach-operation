@@ -8,45 +8,45 @@ class Result
     protected $finalTrack;
     protected $pipeline;
 
-    function __construct($params, $finalTrack, $pipeline)
+    public function __construct($params, $finalTrack, $pipeline)
     {
         $this->params = $params;
         $this->finalTrack = $finalTrack;
         $this->pipeline = $pipeline;
     }
 
-    function isSuccess()
+    public function isSuccess()
     {
         return $this->finalTrack == Railway::TRACK_SUCCESS;
     }
 
-    function isError()
+    public function isError()
     {
         return $this->finalTrack == Railway::TRACK_FAILURE;
     }
 
-    function params()
+    public function params()
     {
         return $this->params;
     }
 
-    function param($name)
+    public function param($name)
     {
         return $this->params[$name];
     }
 
-    function errors()
+    public function errors()
     {
         return $this->params['errors'];
     }
 
-    function errorsText($glue = '.')
+    public function errorsText($glue = '.')
     {
         print_r($this->params);
         return implode($glue, $this->params['errors']);
     }
 
-    function pipeline()
+    public function pipeline()
     {
         return $this->pipeline;
     }

@@ -6,7 +6,7 @@ use einfach\operation\Railway;
 
 class Wrap extends AbstractStep
 {
-    function __invoke(&$params, string $track)
+    public function __invoke(&$params, string $track)
     {
         // only on OK track
         if ($track == Railway::TRACK_SUCCESS) {
