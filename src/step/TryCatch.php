@@ -12,7 +12,8 @@ class TryCatch extends AbstractStep
         // only on OK track
         if ($track == Railway::TRACK_SUCCESS) {
             try {
-                return call_user_func($this->function, $params);
+                $result = call_user_func($this->function, $params);
+                return $this->normalizeStepResult($result);
             } catch (\Exception $e) {
                 return error($e->getMessage());
             }

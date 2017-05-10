@@ -1,18 +1,15 @@
 <?php
 
 use einfach\operation\Railway;
+use einfach\operation\Result;
 use function einfach\operation\response\ok;
 use function einfach\operation\response\error;
 
 class UpdateOperation implements \einfach\operation\IOperation
 {
-    /**
-     * @param $params
-     * @return \einfach\operation\Result
-     */
-    public function __invoke($params)
+    public function railway() : Railway
     {
-        $result = (new Railway)
+        return (new Railway)
             ->step(function ($params) {
                 echo "Hey {$params['name']}. Say hello to anonymous function!";
                 //return error('Early fail');
@@ -25,15 +22,23 @@ class UpdateOperation implements \einfach\operation\IOperation
             ->step([$this, 'updateDB'])
             ->tryCatch([$this, 'sendNotification'])
             ->always([$this, 'writeLog'])
-            ->failure([$this, 'notifyAdmin'])
-            ->runWithParams($params);
+            ->failure([$this, 'notifyAdmin']);
+    }
+
+    /**
+     * @param array $params
+     */
+    public function __invoke(array $params) : Result
+    {
+        $result = $this->railway()->runWithParams($params);
 
         return $result;
     }
 
-    public function nestedRailway($params){
+    public function nestedRailway($params)
+    {
         return (new Railway)
-            ->step(function ($params){
+            ->step(function ($params) {
                 //return error('Nested Railway failed!');
                 return ok(['nestedRwParam' => 'nestedRwValue']);
             })
@@ -55,7 +60,7 @@ class UpdateOperation implements \einfach\operation\IOperation
         // pretend I am doing a query
         // $user = DB::findById($params['id']);
         $user = (object) ['id' => 123, 'name' => 'Eugene', 'phone' => '111111'];
-       return ok(['model' => $user]);
+        return ok(['model' => $user]);
         //return error('User not found!');
     }
 
@@ -72,12 +77,10 @@ class UpdateOperation implements \einfach\operation\IOperation
 
     public function writeLog($params)
     {
-
     }
 
     public function notifyAdmin($params)
     {
-
     }
 }
 
@@ -93,8 +96,8 @@ render($dbResult, $validRequest);
 
 */
 
-
-//->wrap(function ($params) use ($dbConn) {
+// WRAPPER EXAMPLE WITH TRANSACTIONS
+//->step(function ($params) use ($dbConn) {
 //    /** @var $pipe Pipe */
 //    $params['dbConn'] = $dbConn;
 //

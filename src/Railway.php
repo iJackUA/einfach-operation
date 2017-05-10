@@ -11,7 +11,6 @@ use einfach\operation\step\Failure;
 use einfach\operation\step\AbstractStep;
 use einfach\operation\step\Always;
 use einfach\operation\step\TryCatch;
-use einfach\operation\step\Wrap;
 
 class Railway
 {
@@ -42,43 +41,22 @@ class Railway
 
     public function step(callable $callable, $opt = []) : Railway
     {
-        $signature = $this->nextStepSignature($callable, 'Step', $opt);
-        return $this->rawStep(new Step($callable, $signature), $opt);
+        return $this->rawStep(new Step($callable, $opt['name']), $opt);
     }
 
     public function always(callable $callable, $opt = []) : Railway
     {
-        $signature = $this->nextStepSignature($callable, 'Always', $opt);
-        return $this->rawStep(new Always($callable, $signature), $opt);
+        return $this->rawStep(new Always($callable, $opt['name']), $opt);
     }
 
     public function failure(callable $callable, $opt = []) : Railway
     {
-        $signature = $this->nextStepSignature($callable, 'Failure', $opt);
-        return $this->rawStep(new Failure($callable, $signature), $opt);
+        return $this->rawStep(new Failure($callable, $opt['name']), $opt);
     }
 
     public function tryCatch(callable $callable, $opt = []) : Railway
     {
-        $signature = $this->nextStepSignature($callable, 'TryCatch', $opt);
-        return $this->rawStep(new TryCatch($callable, $signature), $opt);
-    }
-
-    public function wrap(callable $callable, $opt = []) : Railway
-    {
-        // check if Result -> evaluate
-        // if bool -> passthrough
-        $signature = $this->nextStepSignature($callable, 'Wrap', $opt);
-        return $this->rawStep(new Wrap($callable, $signature), $opt);
-    }
-
-    public function nextStepSignature(callable $callable, $stepName, $opt) : Railway
-    {
-        is_callable($callable, false, $functionName);
-        // assign custom step name from operation if provided
-        $functionName = $opt['name'] ?? $functionName;
-        $counter = $this->stepsQueue->count() + 1;
-        return "#" . sprintf("%02d", $counter) . " | " . sprintf("%-10s", $stepName) . " | $functionName";
+        return $this->rawStep(new TryCatch($callable, $opt['name']), $opt);
     }
 
     /**
@@ -110,20 +88,6 @@ class Railway
     {
         $newTrack = $track;
         $stepResult = $step($params, $track);
-//TODO: Extract method
-        if (is_a($stepResult, Result::class)) {
-            if ($stepResult->isSuccess()) {
-                $stepResult = [
-                    'type' => RESPONSE_TYPE_OK,
-                    'appendParams' => $stepResult->params()
-                ];
-            } else {
-                $stepResult = [
-                    'type' => RESPONSE_TYPE_ERROR,
-                    'appendError' => $stepResult->errors()
-                ];
-            }
-        }
 
         if (!$step->isSkipped()) {
             if (isValidResponse($stepResult)) {
@@ -141,7 +105,7 @@ class Railway
                     $params['errors'] = $params['errors'] + $appendError;
                 }
 
-                $signaturesPipeline[] = $step->signature;
+                $signaturesPipeline[] = $this->getStepClassName($step);
             } else {
                 $actualResult = var_export($stepResult, true);
                 throw new \Exception("Step returned incorrectly formatted result: {$actualResult}");
@@ -149,5 +113,11 @@ class Railway
         }
 
         return $newTrack;
+    }
+
+    protected function getStepClassName(AbstractStep $step) : string
+    {
+        $className = (new \ReflectionClass($step))->getShortName();
+        return sprintf("%-10s", $className) . " | " . $step->functionName();
     }
 }

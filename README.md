@@ -15,7 +15,7 @@
 
 ### Run tests/inspections
 
-* `docker-compose run php phpunit`
+* `docker-compose run php composer run test`
 * `docker-compose run php ./vendor/bin/phpcs --standard=psr2 src/`
 
 
