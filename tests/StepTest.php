@@ -80,7 +80,7 @@ class StepTest extends \PHPUnit\Framework\TestCase
                 //return error('Nested Railway failed!');
                 return ok(['nestedRwParam' => 'nestedRwValue']);
             })
-            ->runWithParams($params);
+            ->runWithParams([]);
         };
 
         $step = new Step($closure, 'myTestStep');
