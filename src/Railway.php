@@ -41,22 +41,26 @@ class Railway
 
     public function step(callable $callable, $opt = []) : Railway
     {
-        return $this->rawStep(new Step($callable, $opt['name']), $opt);
+        $name = $opt['name'] ?? null;
+        return $this->rawStep(new Step($callable, $name), $opt);
     }
 
     public function always(callable $callable, $opt = []) : Railway
     {
-        return $this->rawStep(new Always($callable, $opt['name']), $opt);
+        $name = $opt['name'] ?? null;
+        return $this->rawStep(new Always($callable, $name), $opt);
     }
 
     public function failure(callable $callable, $opt = []) : Railway
     {
-        return $this->rawStep(new Failure($callable, $opt['name']), $opt);
+        $name = $opt['name'] ?? null;
+        return $this->rawStep(new Failure($callable, $name), $opt);
     }
 
     public function tryCatch(callable $callable, $opt = []) : Railway
     {
-        return $this->rawStep(new TryCatch($callable, $opt['name']), $opt);
+        $name = $opt['name'] ?? null;
+        return $this->rawStep(new TryCatch($callable, $name), $opt);
     }
 
     /**

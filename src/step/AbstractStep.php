@@ -47,7 +47,8 @@ abstract class AbstractStep
      * Transform all results into valid resut array form
      * It could be Result object instance for nested steps
      */
-    protected function normalizeStepResult($result) : array {
+    protected function normalizeStepResult($result) : array
+    {
         $stepResult = $result;
         
         if (is_a($result, Result::class)) {
@@ -62,7 +63,7 @@ abstract class AbstractStep
                     'appendError' => $result->errors()
                 ];
             }
-        } 
+        }
 
         return $stepResult;
     }
