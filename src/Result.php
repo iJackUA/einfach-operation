@@ -42,7 +42,6 @@ class Result
 
     public function errorsText($glue = '.')
     {
-        print_r($this->params);
         return implode($glue, $this->params['__errors']);
     }
 

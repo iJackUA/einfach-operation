@@ -4,6 +4,9 @@ namespace einfach\operation\step;
 
 use const einfach\operation\response\RESPONSE_TYPE_ERROR;
 use const einfach\operation\response\RESPONSE_TYPE_OK;
+use function einfach\operation\response\isValidResponse;
+use function einfach\operation\response\isOk;
+use function einfach\operation\response\isError;
 use einfach\operation\Result;
 
 abstract class AbstractStep
@@ -61,22 +64,36 @@ abstract class AbstractStep
      * Transform all results into valid resut array form
      * It could be Result object instance for nested steps
      */
-    protected function normalizeStepResult($result) : array
+    protected function normalizeStepResponse($result) : array
     {
         $stepResult = $result;
         
         if (is_a($result, Result::class)) {
-            if ($result->isSuccess()) {
-                $stepResult = [
-                    'type' => RESPONSE_TYPE_OK,
-                    'appendParams' => $result->params()
+             $stepResult = [
+                    'params' => $result->params(),
+                    'type' => ($result->isSuccess()) ? RESPONSE_TYPE_OK : RESPONSE_TYPE_ERROR
                 ];
-            } else {
-                $stepResult = [
-                    'type' => RESPONSE_TYPE_ERROR,
-                    'appendError' => $result->errors()
-                ];
+        }
+
+        if (!isValidResponse($stepResult)) {
+            $actualResult = var_export($stepResult, true);
+            throw new \Exception("Step '{$this->name()}' returned incorrectly formatted result. \
+            Maybe you forgot to return `ok(\$params)` or `error(\$params)`. \
+            Current return: {$actualResult}");
+        }
+
+        if (isOk($stepResult)) {
+            $appendParams = $stepResult['appendParams'] ?? [];
+            $stepResult['params'] = $stepResult['params'] ?? [];
+            $stepResult['params'] = array_merge($stepResult['params'], $appendParams);
+            unset($stepResult['appendParams']);
+        } elseif (isError($stepResult)) {
+            $appendError = $stepResult['appendError'] ?? [];
+            $stepResult['params']['__errors'] = $stepResult['params']['__errors'] ?? [];
+            if ($appendError) {
+                $stepResult['params']['__errors'] = $stepResult['params']['__errors'] + $appendError;
             }
+            unset($stepResult['appendError']);
         }
 
         return $stepResult;

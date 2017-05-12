@@ -3,37 +3,28 @@
 namespace einfach\operation\test;
 
 use einfach\operation\Railway;
-use einfach\operation\step\Step;
+use einfach\operation\step\Always;
 use function einfach\operation\response\ok;
 use function einfach\operation\response\error;
 use function einfach\operation\response\isOk;
 use function einfach\operation\response\isError;
 use function einfach\operation\response\isValidResponse;
 
-class StepTest extends \PHPUnit\Framework\TestCase
+class AlwaysTest extends \PHPUnit\Framework\TestCase
 {
     const STEP_NAME = 'myTestStep';
 
     public function testOnSuccessTrackOk()
     {
         $closure = function ($params) {
-            $params['newParam1'] = 'value1';
-            return ok($params, ['newParam2' => 'value2']);
+            return ok($params);
         };
-        $step = new Step($closure, self::STEP_NAME);
+        $step = new Always($closure);
         $params = [];
         $result = $step($params, Railway::TRACK_SUCCESS);
 
-        $this->assertTrue(isValidResponse($result));
         $this->assertTrue(isOk($result));
-        $this->assertFalse(isError($result));
         $this->assertFalse($step->isSkipped());
-
-        $this->assertEquals($step->name(), self::STEP_NAME);
-        
-        $this->assertFalse(isset($result['appendParams']));
-        $this->assertEquals($result['params']['newParam1'], 'value1');
-        $this->assertEquals($result['params']['newParam2'], 'value2');
     }
 
     public function testOnSuccessTrackError()
@@ -41,12 +32,10 @@ class StepTest extends \PHPUnit\Framework\TestCase
         $closure = function ($params) {
             return error($params);
         };
-        $step = new Step($closure, self::STEP_NAME);
+        $step = new Always($closure);
         $params = [];
         $result = $step($params, Railway::TRACK_SUCCESS);
 
-        $this->assertTrue(isValidResponse($result));
-        $this->assertFalse(isOk($result));
         $this->assertTrue(isError($result));
         $this->assertFalse($step->isSkipped());
     }
@@ -56,13 +45,12 @@ class StepTest extends \PHPUnit\Framework\TestCase
         $closure = function ($params) {
             return ok($params);
         };
-        $step = new Step($closure, self::STEP_NAME);
+        $step = new Always($closure);
         $params = [];
         $result = $step($params, Railway::TRACK_FAILURE);
 
-        $this->assertFalse(isValidResponse($result));
-        $this->assertNull($result);
-        $this->assertTrue($step->isSkipped());
+        $this->assertTrue(isError($result));
+        $this->assertFalse($step->isSkipped());
     }
 
     public function testOnFailureTrackError()
@@ -70,16 +58,15 @@ class StepTest extends \PHPUnit\Framework\TestCase
         $closure = function ($params) {
             return error($params);
         };
-        $step = new Step($closure, self::STEP_NAME);
+        $step = new Always($closure);
         $params = [];
         $result = $step($params, Railway::TRACK_FAILURE);
 
-        $this->assertFalse(isValidResponse($result));
-        $this->assertNull($result);
-        $this->assertTrue($step->isSkipped());
+        $this->assertTrue(isError($result));
+        $this->assertFalse($step->isSkipped());
     }
 
-    public function testNestedRailway()
+    public function testNestedRailwayOnSuccess()
     {
         $closure = function ($params) {
             return (new Railway)
@@ -89,13 +76,31 @@ class StepTest extends \PHPUnit\Framework\TestCase
             ->runWithParams([]);
         };
 
-        $step = new Step($closure, self::STEP_NAME);
+        $step = new Always($closure);
         $params = [];
         $result = $step($params, Railway::TRACK_SUCCESS);
 
-        $this->assertTrue(isValidResponse($result));
         $this->assertTrue(isOk($result));
-        $this->assertFalse(isError($result));
+        $this->assertArrayHasKey('nestedRwParam', $result['params']);
+        $this->assertFalse($step->isSkipped());
+    }
+
+       public function testNestedRailwayOnFailureStillExecuted()
+    {
+        $closure = function ($params) {
+            return (new Railway)
+            ->step(function ($params) {
+                return ok(['nestedRwParam' => 'nestedRwValue']);
+            })
+            ->runWithParams([]);
+        };
+
+        $step = new Always($closure);
+        $params = [];
+        $result = $step($params, Railway::TRACK_FAILURE);
+
+        $this->assertTrue(isError($result));
+        $this->assertArrayHasKey('nestedRwParam', $result['params']);
         $this->assertFalse($step->isSkipped());
     }
 }

@@ -20,7 +20,7 @@ class Railway
     /**
      * @var \SplQueue
      */
-    protected $stepsQueue;
+    public $stepsQueue;
     /**
      * Accumulator of passed steps, while running railway
      *
@@ -36,7 +36,7 @@ class Railway
     /**
      *
      * @param AbstractStep $stepObject
-     * @param array $opt
+     * @param array        $opt
      * @return $this
      */
     public function rawStep(AbstractStep $stepObject, $opt = []) : Railway
@@ -81,7 +81,9 @@ class Railway
 
         $track = self::TRACK_SUCCESS;
         foreach ($this->stepsQueue as $step) {
-            /** @var $step AbstractStep */
+            /**
+ * @var $step AbstractStep
+*/
             $track = $this->performStep($step, $params, $track);
         }
         return new Result($params, $track, $this->signaturesPipeline);
@@ -97,19 +99,12 @@ class Railway
 
         if (!$step->isSkipped()) {
             if (isValidResponse($stepResult)) {
-                $type = $stepResult['type'];
-                if (isOk($type)) {
+                if (isOk($stepResult)) {
                     $nextTrack = self::TRACK_SUCCESS;
-                    $appendParams = $stepResult['appendParams'] ?? [];
-                    $params = array_merge($params, $appendParams);
-                } elseif (isError($type)) {
+                } elseif (isError($stepResult)) {
                     $nextTrack = self::TRACK_FAILURE;
-                    $appendError = $stepResult['appendError'] ?? [];
-                    if($appendError) {
-                        $params['__errors'] = $params['__errors'] + $appendError;
-                    }
                 }
-
+                $params = $stepResult['params'];
                 $this->signaturesPipeline[] = $step->signature();
             } else {
                 $actualResult = var_export($stepResult, true);

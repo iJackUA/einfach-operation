@@ -12,8 +12,8 @@ class UpdateOperation implements \einfach\operation\IOperation
         return (new Railway)
             ->step(function ($params) {
                 echo "Hey {$params['name']}. Say hello to anonymous function!";
-                //return error('Early fail');
-                return ok(['newParam' => 'newValue']);
+                //return error($params, 'Early fail');
+                return ok($params, ['newParam' => 'newValue']);
             })
             ->step([$this, 'nestedRailway'])
             ->step([$this, 'castRequest'])
@@ -39,20 +39,20 @@ class UpdateOperation implements \einfach\operation\IOperation
     {
         return (new Railway)
             ->step(function ($params) {
-                //return error('Nested Railway failed!');
-                return ok(['nestedRwParam' => 'nestedRwValue']);
+                //return error($params, 'Nested Railway failed!');
+                return ok($params, ['nestedRwParam' => 'nestedRwValue']);
             })
             ->runWithParams($params);
     }
 
     public function castRequest($params)
     {
-        return ok();
+        return ok($params);
     }
 
     public function validateRequest($params)
     {
-        return ok();
+        return ok($params);
     }
 
     public function findUser($params)
@@ -60,27 +60,29 @@ class UpdateOperation implements \einfach\operation\IOperation
         // pretend I am doing a query
         // $user = DB::findById($params['id']);
         $user = (object) ['id' => 123, 'name' => 'Eugene', 'phone' => '111111'];
-        return ok(['model' => $user]);
-        //return error('User not found!');
+        return error($params, 'User not found!');    
+        return ok($params, ['model' => $user]);
     }
 
     public function updateDB($params)
     {
-        return ok();
+        return ok($params);
     }
 
     public function sendNotification($params)
     {
         //throw new \Exception("Hey there, Exception!");
-        return ok();
+        return ok($params);
     }
 
     public function writeLog($params)
     {
+        return ok($params);
     }
 
     public function notifyAdmin($params)
     {
+        return ok($params);
     }
 }
 

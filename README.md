@@ -17,6 +17,7 @@
 
 * `docker-compose run php composer run test`
 * `docker-compose run php ./vendor/bin/phpcs --standard=psr2 src/`
+* `docker-compose run php ./vendor/bin/phpcbf --report=diff --standard=psr2 src/`
 
 ### TODO
 

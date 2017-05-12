@@ -11,9 +11,11 @@ class Failure extends AbstractStep
     {
         // works only on Error track
         if ($track == Railway::TRACK_FAILURE) {
-            call_user_func($this->function, $params);
+            $response = call_user_func($this->function, $params);
+            $response = $this->normalizeStepResponse($response);
             // does not respect function return and always back to error track
-            return ['type' => RESPONSE_TYPE_ERROR];
+            $response['type'] = RESPONSE_TYPE_ERROR;
+            return $response;
         } else {
             $this->skip();
         }

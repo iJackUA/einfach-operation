@@ -10,8 +10,8 @@ class Step extends AbstractStep
     {
         // only on OK track
         if ($track == Railway::TRACK_SUCCESS) {
-            $result = call_user_func($this->function, $params);
-            return $this->normalizeStepResult($result);
+            $response = call_user_func($this->function, $params);
+            return $this->normalizeStepResponse($response);
         } else {
             $this->skip();
         }

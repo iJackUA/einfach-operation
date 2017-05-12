@@ -10,34 +10,34 @@ class FunctionsTest extends \PHPUnit\Framework\TestCase
     public function testOk()
     {
         $this->assertEquals(
-            ok(['a' => 'b']),
-            ['type' => RESPONSE_TYPE_OK, 'appendParams' => ['a' => 'b']]
+            ok(['param1' => 1], ['a' => 'b']),
+            ['params' => ['param1' => 1], 'type' => RESPONSE_TYPE_OK, 'appendParams' => ['a' => 'b']]
         );
     }
 
     public function testError()
     {
         $this->assertEquals(
-            error('Oh!'),
-            ['type' => RESPONSE_TYPE_ERROR, 'appendError' => ['Oh!']]
+            error(['param1' => 1], 'Oh!'),
+            ['params' => ['param1' => 1], 'type' => RESPONSE_TYPE_ERROR, 'appendError' => ['Oh!']]
         ); 
     }
 
     public function testisOk()
     {
-        $this->assertTrue(isOk(RESPONSE_TYPE_OK));
-        $this->assertFalse(isOk(RESPONSE_TYPE_ERROR));
+        $this->assertTrue(isOk(ok([])));
+        $this->assertFalse(isOk(error([])));
     }
 
     public function testisError()
     {
-        $this->assertTrue(isError(RESPONSE_TYPE_ERROR));
-        $this->assertFalse(isError(RESPONSE_TYPE_OK));
+        $this->assertTrue(isError(error([])));
+        $this->assertFalse(isError(ok([])));
     }
 
-    public function testisValidResponse()
+    public function testIsValidResponse()
     {
-        $this->assertTrue(isValidResponse(['type' => RESPONSE_TYPE_OK, 'appendParams' => []]));
+        $this->assertTrue(isValidResponse(['params' => ['param1' => 1], 'type' => RESPONSE_TYPE_OK, 'appendParams' => []]));
         $this->assertFalse(isValidResponse(['appendParams' => []]));
     }
 }

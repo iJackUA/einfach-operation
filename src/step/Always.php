@@ -10,9 +10,10 @@ class Always extends AbstractStep
 {
     public function __invoke(&$params, string $track)
     {
-        // do not change track, not consider result
-        call_user_func($this->function, $params);
-        $type = ($track == Railway::TRACK_SUCCESS) ? RESPONSE_TYPE_OK : RESPONSE_TYPE_ERROR;
-        return ['type' => $type];
+        $response = $this->normalizeStepResponse(call_user_func($this->function, $params));
+        // run on any track, but not change it to OK, if strated on Error
+        $type = ($track == Railway::TRACK_FAILURE) ? RESPONSE_TYPE_ERROR : $response['type'];
+        $response['type'] = $type;
+        return $response;
     }
 }
