@@ -131,7 +131,8 @@ class Railway
         return $this->rawStep(new TryCatch($callable, $name), $opt);
     }
 
-    public function removeStep(string $stepName){
+    public function removeStep(string $stepName)
+    {
         $targetIndex = $this->findTargetStepIndex($stepName);
         unset($this->stepsQueue[$targetIndex]);
         return $this;
