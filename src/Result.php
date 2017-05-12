@@ -8,7 +8,7 @@ class Result
     protected $finalTrack;
     protected $pipeline;
 
-    public function __construct($params, $finalTrack, $pipeline)
+    public function __construct($params, $finalTrack, $pipeline = [])
     {
         $this->params = $params;
         $this->finalTrack = $finalTrack;
@@ -37,13 +37,13 @@ class Result
 
     public function errors()
     {
-        return $this->params['errors'];
+        return $this->params['__errors'];
     }
 
     public function errorsText($glue = '.')
     {
         print_r($this->params);
-        return implode($glue, $this->params['errors']);
+        return implode($glue, $this->params['__errors']);
     }
 
     public function pipeline()

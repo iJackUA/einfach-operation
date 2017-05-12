@@ -21,10 +21,16 @@ class Railway
      * @var \SplQueue
      */
     protected $stepsQueue;
+    /**
+     * Accumulator of passed steps, while running railway
+     *
+     * @var array
+     */
+    protected $signaturesPipeline = [];
 
     public function __construct()
     {
-        $this->stepsQueue = new \SplQueue();
+        $this->stepsQueue = new \SplObjectStorage();
     }
 
     /**
@@ -35,7 +41,7 @@ class Railway
      */
     public function rawStep(AbstractStep $stepObject, $opt = []) : Railway
     {
-        $this->stepsQueue->enqueue($stepObject);
+        $this->stepsQueue->attach($stepObject, $opt);
         return $this;
     }
 
@@ -71,51 +77,46 @@ class Railway
     public function runWithParams($params)
     {
         // a bit hardcoded, but let it be :)
-        $params['errors'] = [];
-        $signaturesPipeline = [];
+        $params['__errors'] = [];
 
         $track = self::TRACK_SUCCESS;
         foreach ($this->stepsQueue as $step) {
             /** @var $step AbstractStep */
-            $track = $this->performStep($step, $params, $track, $signaturesPipeline);
+            $track = $this->performStep($step, $params, $track);
         }
-        return new Result($params, $track, $signaturesPipeline);
+        return new Result($params, $track, $this->signaturesPipeline);
     }
 
     /**
-     * @param $params
-     * @param $step
-     * @return string
      * @throws \Exception
      */
-    protected function performStep($step, &$params, $track, &$signaturesPipeline)
+    protected function performStep($step, &$params, $track)
     {
-        $newTrack = $track;
+        $nextTrack = $track;
         $stepResult = $step($params, $track);
 
         if (!$step->isSkipped()) {
             if (isValidResponse($stepResult)) {
                 $type = $stepResult['type'];
                 if (isOk($type)) {
-                    $newTrack = self::TRACK_SUCCESS;
+                    $nextTrack = self::TRACK_SUCCESS;
                     $appendParams = $stepResult['appendParams'] ?? [];
                     $params = array_merge($params, $appendParams);
                 } elseif (isError($type)) {
-                    $newTrack = self::TRACK_FAILURE;
-                    $appendError = [$stepResult['appendError']] ?? [];
-                    // TODO: Fix errors merge
-                    print_r($params['errors']);
-                    print_r($appendError);
-                    $params['errors'] = $params['errors'] + $appendError;
+                    $nextTrack = self::TRACK_FAILURE;
+                    $appendError = $stepResult['appendError'] ?? [];
+                    if($appendError) {
+                        $params['__errors'] = $params['__errors'] + $appendError;
+                    }
                 }
 
-                $signaturesPipeline[] = $step->signature();
+                $this->signaturesPipeline[] = $step->signature();
             } else {
                 $actualResult = var_export($stepResult, true);
                 throw new \Exception("Step returned incorrectly formatted result: {$actualResult}");
             }
         }
 
-        return $newTrack;
+        return $nextTrack;
     }
 }

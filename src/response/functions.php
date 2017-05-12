@@ -5,13 +5,18 @@ namespace einfach\operation\response;
 const RESPONSE_TYPE_OK = 'ok_step_response';
 const RESPONSE_TYPE_ERROR = 'error_step_response';
 
-function ok($appendParams = [])
+function ok(array $appendParams = [])
 {
     return ['type' => RESPONSE_TYPE_OK, 'appendParams' => $appendParams];
 }
 
-function error($appendError = [])
+/**
+ * @param mixed $appendError Can accept Array of string or a single String 
+ * and convert it to Array of strings
+ */
+function error($appendError)
 {
+    $appendError = (is_string($appendError)) ? [$appendError] : $appendError;
     return ['type' => RESPONSE_TYPE_ERROR, 'appendError' => $appendError];
 }
 
