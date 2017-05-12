@@ -18,6 +18,9 @@ class UpdateOperation implements \einfach\operation\IOperation
             ->step([$this, 'nestedRailway'])
             ->step([$this, 'castRequest'], ['name' => 'CastReq'])
             ->step([$this, 'validateRequest'])
+            ->step(function ($params) {
+                return error($params, 'AAA!!!');
+            }, ['failFast' => true])
             ->step([$this, 'findUser'])
             ->step([$this, 'updateDB'])
             ->removeStep('CastReq')

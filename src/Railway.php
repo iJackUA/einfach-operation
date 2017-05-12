@@ -155,6 +155,11 @@ class Railway
              * @var $step AbstractStep
             */
             $track = $this->performStep($step, $params, $opt, $track);
+
+            $failFast = $opt['failFast'] ?? null;
+            if($failFast && $track == self::TRACK_FAILURE) {
+                 break;
+            }
         }
         return new Result($params, $track, $this->signaturesPipeline);
     }

@@ -21,7 +21,6 @@
 
 ### TODO
 
-* fail fast option
 * CRDU example with unherited operations
 
 ## License
