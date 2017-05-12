@@ -32,7 +32,8 @@ class AbstractStepTest extends \PHPUnit\Framework\TestCase
 
     public function testCustomFunctionName()
     {
-        $this->assertEquals($this->step->functionName(), self::STEP_NAME);
+        $this->assertEquals($this->step->functionSignature(), 'Closure::__invoke');
+        $this->assertEquals($this->step->name(), self::STEP_NAME);
     }
 
     public function testDefaultFunctionName()
@@ -44,6 +45,7 @@ class AbstractStepTest extends \PHPUnit\Framework\TestCase
 
         $this->step = $this->getMockForAbstractClass(AbstractStep::class, $constructorParams);
         
-        $this->assertEquals($this->step->functionName(), 'Closure::__invoke');
+        $this->assertEquals($this->step->functionSignature(), 'Closure::__invoke');
+        $this->assertEquals($this->step->name(), 'Closure::__invoke');
     }
 }

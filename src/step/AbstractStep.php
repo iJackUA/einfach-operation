@@ -37,10 +37,24 @@ abstract class AbstractStep
         return $this->skipped = true;
     }
 
-    public function functionName() : string
+    public function functionSignature() : string
     {
         is_callable($this->function, false, $functionName);
-        return $this->name ?? $functionName;
+        return $functionName;
+    }
+
+    /**
+     * Step name, respecting custom name
+     */
+    public function name() : string
+    {
+        return $this->name ?? $this->functionSignature();
+    }
+
+    public function signature($template = "%-10s | %s") : string
+    {
+        $className = (new \ReflectionClass($this))->getShortName();
+        return sprintf($template, $className, $this->name());
     }
 
     /**

@@ -109,7 +109,7 @@ class Railway
                     $params['errors'] = $params['errors'] + $appendError;
                 }
 
-                $signaturesPipeline[] = $this->getStepClassName($step);
+                $signaturesPipeline[] = $step->signature();
             } else {
                 $actualResult = var_export($stepResult, true);
                 throw new \Exception("Step returned incorrectly formatted result: {$actualResult}");
@@ -117,11 +117,5 @@ class Railway
         }
 
         return $newTrack;
-    }
-
-    protected function getStepClassName(AbstractStep $step) : string
-    {
-        $className = (new \ReflectionClass($step))->getShortName();
-        return sprintf("%-10s", $className) . " | " . $step->functionName();
     }
 }
