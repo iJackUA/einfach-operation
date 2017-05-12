@@ -30,7 +30,56 @@ class Railway
 
     public function __construct()
     {
-        $this->stepsQueue = new \SplObjectStorage();
+        $this->stepsQueue = [];
+    }
+
+    protected function findTargetStepIndex($stepName)
+    {
+        $steps = array_column($this->stepsQueue, 'step');
+        $names = array_map(function ($step) {
+            return $step->name();
+        }, $steps);
+
+        $targetIndex = array_search($stepName, $names);
+        return $targetIndex;
+    }
+
+    protected function insertStepBefore(string $stepName, AbstractStep $stepObject, array $opt)
+    {
+        $targetIndex = $this->findTargetStepIndex($stepName);
+        $step = [
+            'step' => $stepObject,
+            'opt' => $opt
+        ];
+        array_splice($this->stepsQueue, $targetIndex, 0, [$step]);
+    }
+
+    protected function insertStepAfter(string $stepName, AbstractStep $stepObject, array $opt)
+    {
+        $targetIndex = $this->findTargetStepIndex($stepName);
+        $step = [
+            'step' => $stepObject,
+            'opt' => $opt
+        ];
+        array_splice($this->stepsQueue, $targetIndex + 1, 0, [$step]);
+    }
+
+    protected function replaceStep(string $stepName, AbstractStep $stepObject, array $opt)
+    {
+        $targetIndex = $this->findTargetStepIndex($stepName);
+        $step = [
+            'step' => $stepObject,
+            'opt' => $opt
+        ];
+        array_splice($this->stepsQueue, $targetIndex, 1, [$step]);
+    }
+
+    protected function addStep(AbstractStep $stepObject, array $opt)
+    {
+        $this->stepsQueue[] = [
+            'step' => $stepObject,
+            'opt' => $opt
+        ];
     }
 
     /**
@@ -41,7 +90,20 @@ class Railway
      */
     public function rawStep(AbstractStep $stepObject, $opt = []) : Railway
     {
-        $this->stepsQueue->attach($stepObject, $opt);
+        $before = $opt['before'] ?? null;
+        $after = $opt['after'] ?? null;
+        $replace = $opt['replace'] ?? null;
+
+        if ($before) {
+            $this->insertStepBefore($before, $stepObject, $opt);
+        } elseif ($after) {
+            $this->insertStepAfter($after, $stepObject, $opt);
+        } elseif ($replace) {
+            $this->replaceStep($replace, $stepObject, $opt);
+        } else {
+            $this->addStep($stepObject, $opt);
+        }
+
         return $this;
     }
 
@@ -69,6 +131,12 @@ class Railway
         return $this->rawStep(new TryCatch($callable, $name), $opt);
     }
 
+    public function removeStep(string $stepName){
+        $targetIndex = $this->findTargetStepIndex($stepName);
+        unset($this->stepsQueue[$targetIndex]);
+        return $this;
+    }
+
     /**
      * @param $params
      * @return Result
@@ -80,11 +148,13 @@ class Railway
         $params['__errors'] = [];
 
         $track = self::TRACK_SUCCESS;
-        foreach ($this->stepsQueue as $step) {
+        foreach ($this->stepsQueue as $item) {
+            $step = $item['step'];
+            $opt = $item['opt'];
             /**
- * @var $step AbstractStep
-*/
-            $track = $this->performStep($step, $params, $track);
+             * @var $step AbstractStep
+            */
+            $track = $this->performStep($step, $params, $opt, $track);
         }
         return new Result($params, $track, $this->signaturesPipeline);
     }
@@ -92,10 +162,10 @@ class Railway
     /**
      * @throws \Exception
      */
-    protected function performStep($step, &$params, $track)
+    protected function performStep($step, &$params, $opt, $track)
     {
         $nextTrack = $track;
-        $stepResult = $step($params, $track);
+        $stepResult = $step($params, $track, $opt);
 
         if (!$step->isSkipped()) {
             if (isValidResponse($stepResult)) {

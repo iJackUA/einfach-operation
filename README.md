@@ -21,10 +21,7 @@
 
 ### TODO
 
-* pass params
 * fail fast option
-* steps insertion opts `before`/`after`/`replace`
-* step delete 
 * CRDU example with unherited operations
 
 ## License

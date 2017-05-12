@@ -22,12 +22,14 @@ abstract class AbstractStep
      * @var bool
      */
     protected $skipped;
+    protected $opt;
 
-    public function __construct(callable $callable, string $name = null)
+    public function __construct(callable $callable, string $name = null, array $opt = [])
     {
         $this->function = $callable;
         $this->name = $name;
         $this->skipped = false;
+        $this->opt = $opt;
     }
 
     public function isSkipped() : bool

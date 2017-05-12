@@ -14,15 +14,19 @@ class UpdateOperation implements \einfach\operation\IOperation
                 echo "Hey {$params['name']}. Say hello to anonymous function!";
                 //return error($params, 'Early fail');
                 return ok($params, ['newParam' => 'newValue']);
-            })
+            }, ['name' => 'First'])
             ->step([$this, 'nestedRailway'])
-            ->step([$this, 'castRequest'])
+            ->step([$this, 'castRequest'], ['name' => 'CastReq'])
             ->step([$this, 'validateRequest'])
             ->step([$this, 'findUser'])
             ->step([$this, 'updateDB'])
+            ->removeStep('CastReq')
             ->tryCatch([$this, 'sendNotification'])
             ->always([$this, 'writeLog'])
-            ->failure([$this, 'notifyAdmin']);
+            ->failure([$this, 'notifyAdmin'], ['name' => 'Last'])
+            ->step(function ($params) {
+                return ok($params, ['a' => 'b']);
+            }, ['after' => 'First', 'name' => 'FinalCheck']);
     }
 
     /**
@@ -60,7 +64,7 @@ class UpdateOperation implements \einfach\operation\IOperation
         // pretend I am doing a query
         // $user = DB::findById($params['id']);
         $user = (object) ['id' => 123, 'name' => 'Eugene', 'phone' => '111111'];
-        return error($params, 'User not found!');    
+        //return error($params, 'User not found!');    
         return ok($params, ['model' => $user]);
     }
 
