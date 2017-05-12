@@ -24,6 +24,7 @@ class ComplicatedController
         if ($result->isSuccess()) {
             print_r($result->pipeline());
             $user = $result->params()['model'];
+            print_r($result);
             return "Success! User '{$user->name}' updated!";
         } else {
             print_r($result->pipeline());

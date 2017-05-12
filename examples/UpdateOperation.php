@@ -39,7 +39,7 @@ class UpdateOperation implements \einfach\operation\IOperation
     {
         return (new Railway)
             ->step(function ($params) {
-                return error('Nested Railway failed!');
+                //return error('Nested Railway failed!');
                 return ok(['nestedRwParam' => 'nestedRwValue']);
             })
             ->runWithParams($params);
