@@ -18,6 +18,13 @@
 * `docker-compose run php composer run test`
 * `docker-compose run php ./vendor/bin/phpcs --standard=psr2 src/`
 
+### TODO
+
+* pass params
+* fail fast option
+* steps insertion opts `before`/`after`/`replace`
+* step delete 
+* CRDU example with unherited operations
 
 ## License
 

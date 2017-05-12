@@ -26,7 +26,7 @@ class StepTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isError($result['type']));
         $this->assertFalse($step->isSkipped());
 
-        $this->assertEquals($step->functionName(), 'myTestStep');
+        $this->assertEquals($step->name(), 'myTestStep');
     }
 
     public function testOnSuccessTrackError()
