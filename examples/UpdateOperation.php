@@ -19,7 +19,8 @@ class UpdateOperation implements \einfach\operation\IOperation
             ->step([$this, 'castRequest'], ['name' => 'CastReq'])
             ->step([$this, 'validateRequest'])
             ->step(function ($params) {
-                return error($params, 'AAA!!!');
+                return ok($params);
+                //return error($params, 'AAA!!!');
             }, ['failFast' => true])
             ->step([$this, 'findUser'])
             ->step([$this, 'updateDB'])
@@ -32,14 +33,9 @@ class UpdateOperation implements \einfach\operation\IOperation
             }, ['after' => 'First', 'name' => 'FinalCheck']);
     }
 
-    /**
-     * @param array $params
-     */
     public function __invoke(array $params) : Result
     {
-        $result = $this->railway()->runWithParams($params);
-
-        return $result;
+        return $this->railway()->runWithParams($params);
     }
 
     public function nestedRailway($params)

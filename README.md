@@ -21,7 +21,6 @@
 
 ### TODO
 
-* CRDU example with unherited operations
 
 ## License
 
